@@ -17,6 +17,13 @@
   },
   "license": "MIT",
   "main": "./lib/archive-editor",
+  "files": [
+    "keymaps",
+    "lib",
+    "resources",
+    "spec",
+    "styles"
+  ],
   "engines": {
     "lumine": "^1.0.0"
   },
