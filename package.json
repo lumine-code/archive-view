@@ -1,0 +1,50 @@
+{
+  "name": "archive-view",
+  "author": "lumine-code",
+  "version": "1.0.0",
+  "description": "Browse the files and folders inside archive files.",
+  "keywords": [
+    "zip",
+    "tar",
+    "jar",
+    "epub",
+    "extract",
+    "compressed"
+  ],
+  "repository": "https://github.com/lumine-code/archive-view",
+  "bugs": {
+    "url": "https://github.com/lumine-code/archive-view/issues"
+  },
+  "license": "MIT",
+  "main": "./lib/archive-editor",
+  "engines": {
+    "lumine": "^1.0.0"
+  },
+  "backgroundTips": [
+    "You can open a .zip, .tar, .jar, or .whl archive from the tree view and browse its contents in a tab."
+  ],
+  "scripts": {
+    "test": "lumine --test spec",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "deserializers": {
+    "ArchiveEditor": "deserialize",
+    "ArchiveEditorView": "deserialize"
+  },
+  "dependencies": {
+    "@lumine-code/etch": "https://github.com/lumine-code/etch.git#9c74208ad932e0694cb3f7ad575e7205154dea8f",
+    "@lumine-code/ls-archive": "https://github.com/lumine-code/node-ls-archive.git#f897b86effcc50a6a1a41f04cdc3f4d6f288212d",
+    "humanize-plus": "~1.8.2",
+    "@lumine-code/temp": "https://github.com/lumine-code/node-temp.git#929dfd04196566b21baef93fddc24a19db329bd0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.8.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-n": "^18.2.2",
+    "globals": "^17.7.0",
+    "prettier": "^3.9.6"
+  }
+}
