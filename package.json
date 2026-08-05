@@ -42,9 +42,9 @@
   },
   "dependencies": {
     "@lumine-code/etch": "https://github.com/lumine-code/etch.git#9c74208ad932e0694cb3f7ad575e7205154dea8f",
-    "@lumine-code/ls-archive": "https://github.com/lumine-code/node-ls-archive.git#f897b86effcc50a6a1a41f04cdc3f4d6f288212d",
+    "@lumine-code/ls-archive": "https://github.com/lumine-code/node-ls-archive.git#175cfa141e2f78685677e53d06498cff28e7141a",
     "humanize-plus": "~1.8.2",
-    "@lumine-code/temp": "https://github.com/lumine-code/node-temp.git#929dfd04196566b21baef93fddc24a19db329bd0"
+    "@lumine-code/temp": "https://github.com/lumine-code/node-temp.git#150772eb009638e11ed741bf8548aa74c8e5dd1c"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
