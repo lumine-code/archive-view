@@ -43,15 +43,15 @@
   "dependencies": {
     "@lumine-code/etch": "github:lumine-code/etch#ab36096d3ec06484e8d6ed18402554879648831d",
     "@lumine-code/ls-archive": "github:lumine-code/node-ls-archive#60426dbc0e8c03ffaea860037e7ba41dcae8c0ba",
-    "humanize-plus": "~1.8.2",
-    "@lumine-code/temp": "github:lumine-code/node-temp#66d3a5395c58395b28158264d2a4e768158a08de"
+    "@lumine-code/temp": "github:lumine-code/node-temp#66d3a5395c58395b28158264d2a4e768158a08de",
+    "humanize-plus": "~1.8.2"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "eslint": "^10.8.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-n": "^18.2.2",
-    "globals": "^17.7.0",
+    "globals": "^17.9.0",
     "prettier": "^3.9.6"
   }
 }
