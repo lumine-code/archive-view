@@ -41,10 +41,10 @@
     "ArchiveEditorView": "deserialize"
   },
   "dependencies": {
-    "@lumine-code/etch": "https://github.com/lumine-code/etch.git#ab36096d3ec06484e8d6ed18402554879648831d",
-    "@lumine-code/ls-archive": "https://github.com/lumine-code/node-ls-archive.git#175cfa141e2f78685677e53d06498cff28e7141a",
+    "@lumine-code/etch": "github:lumine-code/etch#ab36096d3ec06484e8d6ed18402554879648831d",
+    "@lumine-code/ls-archive": "github:lumine-code/node-ls-archive#175cfa141e2f78685677e53d06498cff28e7141a",
     "humanize-plus": "~1.8.2",
-    "@lumine-code/temp": "https://github.com/lumine-code/node-temp.git#150772eb009638e11ed741bf8548aa74c8e5dd1c"
+    "@lumine-code/temp": "github:lumine-code/node-temp#150772eb009638e11ed741bf8548aa74c8e5dd1c"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
