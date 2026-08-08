@@ -41,9 +41,9 @@
     "ArchiveEditorView": "deserialize"
   },
   "dependencies": {
-    "@lumine-code/etch": "github:lumine-code/etch#f42254f4cae46ea7c8147038bf99240e15faf6e2",
-    "@lumine-code/ls-archive": "github:lumine-code/node-ls-archive#7e771295663310a4992777ade9f5732d8a8221ba",
-    "@lumine-code/temp": "github:lumine-code/node-temp#5d0a30ffb4d68f21577d057aef8844a55479e304",
+    "@lumine-code/etch": "github:lumine-code/etch#994b3e9e6cc2e570574d18aa2d2288d70ece9e25",
+    "@lumine-code/ls-archive": "github:lumine-code/node-ls-archive#57f6b7a88c3ebaf4f51ea652d16c9ec420f63ff0",
+    "@lumine-code/temp": "github:lumine-code/node-temp#6c6a5887bd452ab659ab1b5b9923b570cb83ef32",
     "humanize-plus": "~1.8.2"
   },
   "devDependencies": {
