@@ -1,5 +1,5 @@
-const { Disposable } = require("atom");
-const atomAPI = require("atom");
+const { Disposable } = require("lumine");
+const lumineAPI = require("lumine");
 const { conditionPromise } = require("./async-spec-helpers");
 
 async function condition(handler) {
@@ -15,7 +15,7 @@ describe("ArchiveEditorView", () => {
   beforeEach(async () => {
     // archive-view watches its file via the core `watchFile` helper. Stub it to
     // capture the callbacks so the tests can drive file events synchronously.
-    spyOn(atomAPI, "watchFile").and.callFake(function (filePath) {
+    spyOn(lumineAPI, "watchFile").and.callFake(function (filePath) {
       const isTar = /\.tar$/.test(filePath);
       return {
         onDidChange(callback) {
@@ -37,8 +37,8 @@ describe("ArchiveEditorView", () => {
       };
     });
 
-    await atom.packages.activatePackage("archive-view");
-    archiveEditorView = await atom.workspace.open("nested.tar");
+    await lumine.packages.activatePackage("archive-view");
+    archiveEditorView = await lumine.workspace.open("nested.tar");
   });
 
   describe(".constructor()", () => {
@@ -77,9 +77,9 @@ describe("ArchiveEditorView", () => {
 
   describe("archive summary", () => {
     beforeEach(async () => {
-      await atom.workspace.open("multiple-entries.zip");
-      archiveEditorView = atom.workspace.getActivePaneItem();
-      jasmine.attachToDOM(atom.views.getView(atom.workspace));
+      await lumine.workspace.open("multiple-entries.zip");
+      archiveEditorView = lumine.workspace.getActivePaneItem();
+      jasmine.attachToDOM(lumine.views.getView(lumine.workspace));
     });
 
     it("shows correct statistics", async () => {
@@ -93,7 +93,7 @@ describe("ArchiveEditorView", () => {
   describe("when core:move-up/core:move-down is triggered", () => {
     let selectedEntry;
     const dispatch = (command) => {
-      atom.commands.dispatch(archiveEditorView.element.querySelector(".selected"), command);
+      lumine.commands.dispatch(archiveEditorView.element.querySelector(".selected"), command);
       selectedEntry = archiveEditorView.element.querySelector(".selected").textContent;
       return true;
     };
@@ -114,9 +114,9 @@ describe("ArchiveEditorView", () => {
     it("copies the contents to a temp file and opens it in a new editor", async () => {
       await condition(() => archiveEditorView.element.querySelectorAll(".entry").length > 0);
       archiveEditorView.element.querySelectorAll(".file")[2].click();
-      await condition(() => atom.workspace.getActivePane().getItems().length > 1);
-      expect(atom.workspace.getActivePaneItem().getText()).toBe("hey there\n");
-      expect(atom.workspace.getActivePaneItem().getTitle()).toBe("fa.txt");
+      await condition(() => lumine.workspace.getActivePane().getItems().length > 1);
+      expect(lumine.workspace.getActivePaneItem().getText()).toBe("hey there\n");
+      expect(lumine.workspace.getActivePaneItem().getTitle()).toBe("fa.txt");
     });
   });
 
@@ -135,10 +135,10 @@ describe("ArchiveEditorView", () => {
   describe("when core:confirm is triggered", () => {
     it("copies the contents to a temp file and opens it in a new editor", async () => {
       await condition(() => archiveEditorView.element.querySelectorAll(".entry").length > 0);
-      atom.commands.dispatch(archiveEditorView.element.querySelector(".file"), "core:confirm");
-      await condition(() => atom.workspace.getActivePane().getItems().length > 1);
-      expect(atom.workspace.getActivePaneItem().getText()).toBe("");
-      expect(atom.workspace.getActivePaneItem().getTitle()).toBe("f1.txt");
+      lumine.commands.dispatch(archiveEditorView.element.querySelector(".file"), "core:confirm");
+      await condition(() => lumine.workspace.getActivePane().getItems().length > 1);
+      expect(lumine.workspace.getActivePaneItem().getText()).toBe("");
+      expect(lumine.workspace.getActivePaneItem().getTitle()).toBe("f1.txt");
     });
   });
 
@@ -170,17 +170,17 @@ describe("ArchiveEditorView", () => {
   describe("when the file is removed", () => {
     it("destroys the view", async () => {
       await condition(() => archiveEditorView.element.querySelectorAll(".entry").length > 0);
-      expect(atom.workspace.getActivePane().getItems().length).toBe(1);
+      expect(lumine.workspace.getActivePane().getItems().length).toBe(1);
       onDidDeleteCallback();
-      expect(atom.workspace.getActivePaneItem()).toBeUndefined();
+      expect(lumine.workspace.getActivePaneItem()).toBeUndefined();
     });
   });
 
   describe("when the file is invalid", () => {
     beforeEach(async () => {
-      await atom.workspace.open("invalid.zip");
-      archiveEditorView = atom.workspace.getActivePaneItem();
-      jasmine.attachToDOM(atom.views.getView(atom.workspace));
+      await lumine.workspace.open("invalid.zip");
+      archiveEditorView = lumine.workspace.getActivePaneItem();
+      jasmine.attachToDOM(lumine.views.getView(lumine.workspace));
     });
 
     it("shows the error", async () => {
@@ -195,13 +195,13 @@ describe("ArchiveEditorView", () => {
     afterEach(() => iconProvider?.dispose());
 
     function provideIcons(iconFor) {
-      iconProvider = atom.packages.serviceHub.provide("icons.provider", "1.0.0", { iconFor });
+      iconProvider = lumine.packages.serviceHub.provide("icons.provider", "1.0.0", { iconFor });
     }
 
     async function openFile() {
-      await atom.workspace.open("file-icons.zip");
-      archiveEditorView = atom.workspace.getActivePaneItem();
-      jasmine.attachToDOM(atom.views.getView(atom.workspace));
+      await lumine.workspace.open("file-icons.zip");
+      archiveEditorView = lumine.workspace.getActivePaneItem();
+      jasmine.attachToDOM(lumine.views.getView(lumine.workspace));
     }
 
     describe("Class handling", () => {

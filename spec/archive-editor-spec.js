@@ -26,18 +26,18 @@ describe("ArchiveEditor", () => {
   describe(".deactivate()", () => {
     it("removes all ArchiveEditorViews from the workspace and does not open any new ones", async () => {
       const getArchiveEditorViews = () => {
-        return atom.workspace.getPaneItems().filter((item) => item instanceof ArchiveEditorView);
+        return lumine.workspace.getPaneItems().filter((item) => item instanceof ArchiveEditorView);
       };
-      await atom.packages.activatePackage("archive-view");
-      await atom.workspace.open(path.join(__dirname, "fixtures", "nested.tar"));
-      await atom.workspace.open(path.join(__dirname, "fixtures", "invalid.zip"));
-      await atom.workspace.open();
+      await lumine.packages.activatePackage("archive-view");
+      await lumine.workspace.open(path.join(__dirname, "fixtures", "nested.tar"));
+      await lumine.workspace.open(path.join(__dirname, "fixtures", "invalid.zip"));
+      await lumine.workspace.open();
       expect(getArchiveEditorViews().length).toBe(2);
 
-      await atom.packages.deactivatePackage("archive-view");
+      await lumine.packages.deactivatePackage("archive-view");
       expect(getArchiveEditorViews().length).toBe(0);
 
-      await atom.workspace.open(path.join(__dirname, "fixtures", "nested.tar"));
+      await lumine.workspace.open(path.join(__dirname, "fixtures", "nested.tar"));
       expect(getArchiveEditorViews().length).toBe(0);
     });
   });

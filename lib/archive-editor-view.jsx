@@ -2,8 +2,8 @@
 const fs = require("fs");
 const path = require("path");
 const humanize = require("humanize-plus");
-const atomAPI = require("atom");
-const { CompositeDisposable, Disposable, Emitter } = atomAPI;
+const lumineAPI = require("lumine");
+const { CompositeDisposable, Disposable, Emitter } = lumineAPI;
 const etch = require("@lumine-code/etch");
 
 const archive = require("./archive");
@@ -16,7 +16,7 @@ module.exports = class ArchiveEditorView {
     this.emitter = new Emitter();
     this.path = archivePath;
     // Called off the module object so a spec can spy on `watchFile`.
-    this.file = atomAPI.watchFile(this.path);
+    this.file = lumineAPI.watchFile(this.path);
     this.entries = [];
     etch.initialize(this);
 
