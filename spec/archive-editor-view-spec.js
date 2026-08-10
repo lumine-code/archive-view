@@ -1,6 +1,5 @@
 const { Disposable } = require("lumine");
 const lumineAPI = require("lumine");
-const { conditionPromise } = require("./async-spec-helpers");
 
 async function condition(handler) {
   if (jasmine.isSpy(window.setTimeout)) {
