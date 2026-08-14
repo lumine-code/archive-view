@@ -11,7 +11,7 @@ Browse the files and folders inside archive files.
 
 ## Installation
 
-To install `archive-view` search for _archive-view_ in the Install pane of the Lumine settings or run `lumine --install lumine-code/archive-view`.
+To install `archive-view` search for it in the Install pane of the Lumine settings, or run the command `lumine --install lumine-code/archive-view`.
 
 ## Customization
 
