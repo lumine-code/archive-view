@@ -42,7 +42,7 @@
   },
   "dependencies": {
     "@lumine-code/etch": "github:lumine-code/etch#ad65d4e2a81aa70839069309fa532635bc007b7e",
-    "@lumine-code/ls-archive": "github:lumine-code/node-ls-archive#c153d19e558fe1034c8844f580a8e910ef75acc9",
+    "@lumine-code/ls-archive": "github:lumine-code/node-ls-archive#0a20916ad8db4d6650f06dac18ea00cc60e057e3",
     "@lumine-code/temp": "github:lumine-code/node-temp#6c6a5887bd452ab659ab1b5b9923b570cb83ef32",
     "humanize-plus": "~1.8.2"
   },
