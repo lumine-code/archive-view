@@ -12,6 +12,7 @@ describe("ArchiveEditorView", () => {
   let archiveEditorView, onDidChangeCallback, onDidRenameCallback, onDidDeleteCallback;
 
   beforeEach(async () => {
+    lumine.config.set("core.closeDeletedFileTabs", false);
     // archive-view watches its file via the core `watchFile` helper. Stub it to
     // capture the callbacks so the tests can drive file events synchronously.
     spyOn(lumineAPI, "watchFile").and.callFake(function (filePath) {
@@ -167,9 +168,24 @@ describe("ArchiveEditorView", () => {
   });
 
   describe("when the file is removed", () => {
-    it("destroys the view", async () => {
+    it("keeps the view open and reports removed", async () => {
       await condition(() => archiveEditorView.element.querySelectorAll(".entry").length > 0);
+      const states = [];
+      archiveEditorView.onDidChangeFileState((state) => states.push(state));
       expect(lumine.workspace.getActivePane().getItems().length).toBe(1);
+      onDidDeleteCallback();
+      expect(lumine.workspace.getActivePaneItem()).toBe(archiveEditorView);
+      expect(archiveEditorView.getFileState()).toBe(lumine.FileState.REMOVED);
+      expect(states).toEqual([lumine.FileState.REMOVED]);
+
+      onDidChangeCallback();
+      expect(archiveEditorView.getFileState()).toBe(lumine.FileState.UNMODIFIED);
+      expect(states).toEqual([lumine.FileState.REMOVED, lumine.FileState.UNMODIFIED]);
+    });
+
+    it("destroys the view when core.closeDeletedFileTabs is enabled", async () => {
+      await condition(() => archiveEditorView.element.querySelectorAll(".entry").length > 0);
+      lumine.config.set("core.closeDeletedFileTabs", true);
       onDidDeleteCallback();
       expect(lumine.workspace.getActivePaneItem()).toBeUndefined();
     });

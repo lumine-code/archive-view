@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const humanize = require("humanize-plus");
 const lumineAPI = require("lumine");
-const { CompositeDisposable, Disposable, Emitter } = lumineAPI;
+const { CompositeDisposable, Disposable, Emitter, FileState } = lumineAPI;
 const etch = require("@lumine-code/etch");
 
 const archive = require("./archive");
@@ -15,6 +15,7 @@ module.exports = class ArchiveEditorView {
     this.disposables = new CompositeDisposable();
     this.emitter = new Emitter();
     this.path = archivePath;
+    this.fileState = fs.existsSync(this.path) ? FileState.UNMODIFIED : FileState.REMOVED;
     // Called off the module object so a spec can spy on `watchFile`.
     this.file = lumineAPI.watchFile(this.path);
     this.entries = [];
@@ -23,15 +24,25 @@ module.exports = class ArchiveEditorView {
     this.refresh();
 
     this.disposables.add(this.file);
-    this.disposables.add(this.file.onDidChange(() => this.refresh()));
+    this.disposables.add(
+      this.file.onDidChange(() => {
+        if (fs.existsSync(this.path)) this.setFileState(FileState.UNMODIFIED);
+        this.refresh();
+      }),
+    );
     this.disposables.add(
       this.file.onDidRename((newPath) => {
         if (newPath) this.path = newPath;
+        this.setFileState(fs.existsSync(this.path) ? FileState.UNMODIFIED : FileState.REMOVED);
         this.emitter.emit("did-change-title");
         this.refresh();
       }),
     );
-    this.disposables.add(this.file.onDidDelete(() => this.destroy()));
+    this.disposables.add(
+      this.file.onDidDelete(() => {
+        this.setFileState(FileState.REMOVED);
+      }),
+    );
 
     const focusHandler = () => this.focusSelectedFile();
 
@@ -80,6 +91,20 @@ module.exports = class ArchiveEditorView {
 
   onDidChangeTitle(callback) {
     return this.emitter.on("did-change-title", callback);
+  }
+
+  getFileState() {
+    return this.fileState;
+  }
+
+  onDidChangeFileState(callback) {
+    return this.emitter.on("did-change-file-state", callback);
+  }
+
+  setFileState(fileState) {
+    if (fileState === this.fileState) return;
+    this.fileState = fileState;
+    this.emitter.emit("did-change-file-state", fileState);
   }
 
   serialize() {
