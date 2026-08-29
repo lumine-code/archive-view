@@ -41,7 +41,7 @@
     "ArchiveEditorView": "deserialize"
   },
   "dependencies": {
-    "@lumine-code/etch": "github:lumine-code/etch#c420908b271dab03ccc97ecf41e2534fc4277b32",
+    "@lumine-code/etch": "github:lumine-code/etch#ced81b11e336b839537fbe207d70b615cb89ad8a",
     "@lumine-code/ls-archive": "github:lumine-code/node-ls-archive#7b184dbba3304b74da72e2ffd246a0b95a1db539",
     "@lumine-code/temp": "github:lumine-code/node-temp#bbd9e24a78e835e7421c8acec360731eafa4d3f6",
     "humanize-plus": "~1.8.2"
