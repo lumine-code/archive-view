@@ -1,4 +1,4 @@
-const { Disposable } = require("lumine");
+const { Disposable, Icon } = require("lumine");
 const lumineAPI = require("lumine");
 
 async function condition(handler) {
@@ -209,8 +209,11 @@ describe("ArchiveEditorView", () => {
 
     afterEach(() => iconProvider?.dispose());
 
-    function provideIcons(iconFor) {
-      iconProvider = lumine.packages.serviceHub.provide("icons.provider", "1.0.0", { iconFor });
+    function provideIcons(iconFor, extra = {}) {
+      iconProvider = lumine.packages.serviceHub.provide("icons.provider", "1.0.0", {
+        iconFor,
+        ...extra,
+      });
     }
 
     async function openFile() {
@@ -259,11 +262,11 @@ describe("ArchiveEditorView", () => {
         provideIcons((target) => {
           switch (target.path.match(/\w*$/)[0]) {
             case "pdf":
-              return "text pdf-icon document";
+              return Icon.classes("text pdf-icon document");
             case "ttf":
-              return "binary ttf-icon font";
+              return Icon.classes("binary ttf-icon font");
             case "gif":
-              return "binary gif-icon image";
+              return Icon.classes("binary gif-icon image");
           }
           return null;
         });
@@ -276,11 +279,11 @@ describe("ArchiveEditorView", () => {
         provideIcons((target) => {
           switch (target.path.match(/\w*$/)[0]) {
             case "pdf":
-              return ["text", "pdf-icon", "document"];
+              return Icon.classes(["text", "pdf-icon", "document"]);
             case "ttf":
-              return ["binary", "ttf-icon", "font"];
+              return Icon.classes(["binary", "ttf-icon", "font"]);
             case "gif":
-              return ["binary", "gif-icon", "image"];
+              return Icon.classes(["binary", "gif-icon", "image"]);
           }
           return null;
         });
@@ -290,7 +293,9 @@ describe("ArchiveEditorView", () => {
       });
 
       it("identifies context to icon providers", async () => {
-        provideIcons((target) => `icon-${target.context}`);
+        provideIcons((target) => Icon.classes([`icon-${target.context}`]), {
+          usesContext: true,
+        });
         await openFile();
         await condition(() => archiveEditorView.element.querySelectorAll(".entry").length > 0);
         const icons =
@@ -313,7 +318,7 @@ describe("ArchiveEditorView", () => {
       it("repaints an archive that is already open", async () => {
         await openFile();
         await condition(() => archiveEditorView.element.querySelectorAll(".entry").length > 0);
-        provideIcons(() => "late-arrival");
+        provideIcons(() => Icon.classes(["late-arrival"]));
         expect(findEntryContainingText("adobe.pdf").querySelector(".file.late-arrival")).toExist();
       });
     });
