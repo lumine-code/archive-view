@@ -166,7 +166,7 @@ module.exports = class ArchiveEditorView {
 
     const originalPath = this.path;
     archive.list(this.path, { tree: true }, (error, entries) => {
-      if (originalPath !== this.path) {
+      if (this.destroyed || originalPath !== this.path) {
         return;
       }
 

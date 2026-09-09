@@ -70,7 +70,25 @@ describe("ArchiveEditorView", () => {
   describe(".copy()", () => {
     it("returns a new ArchiveEditorView for the same file", () => {
       const newArchiveView = archiveEditorView.copy();
-      expect(newArchiveView.getPath()).toBe(archiveEditorView.getPath());
+      try {
+        expect(newArchiveView.getPath()).toBe(archiveEditorView.getPath());
+      } finally {
+        newArchiveView.destroy();
+      }
+    });
+  });
+
+  describe(".destroy()", () => {
+    it("ignores an archive listing that completes after a copied view is destroyed", () => {
+      let completeListing;
+      spyOn(require("../lib/archive"), "list").and.callFake((_path, _options, callback) => {
+        completeListing = callback;
+      });
+      const copy = archiveEditorView.copy();
+      spyOn(copy, "createTreeEntries");
+      copy.destroy();
+      completeListing(null, []);
+      expect(copy.createTreeEntries).not.toHaveBeenCalled();
     });
   });
 
