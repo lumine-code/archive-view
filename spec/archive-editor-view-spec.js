@@ -1,5 +1,6 @@
 const { Disposable, Icon } = require("lumine");
-const lumineAPI = require("lumine");
+const fs = require("node:fs");
+const path = require("node:path");
 
 async function condition(handler) {
   if (jasmine.isSpy(window.setTimeout)) {
@@ -9,29 +10,27 @@ async function condition(handler) {
 }
 
 describe("ArchiveEditorView", () => {
-  let archiveEditorView, onDidChangeCallback, onDidRenameCallback, onDidDeleteCallback;
+  let archiveEditorView, onDidChangeCallback;
 
   beforeEach(async () => {
     lumine.config.set("core.closeDeletedFileTabs", false);
     // archive-view watches its file via the core `watchFile` helper. Stub it to
     // capture the callbacks so the tests can drive file events synchronously.
-    spyOn(lumineAPI, "watchFile").and.callFake(function (filePath) {
+    spyOn(lumine.fileWatchClient, "watchFile").and.callFake(function (filePath) {
       const isTar = /\.tar$/.test(filePath);
       return {
+        path: filePath,
+        ready: Promise.resolve(),
+        closed: Promise.resolve(),
         onDidChange(callback) {
           if (isTar) onDidChangeCallback = callback;
           return new Disposable();
         },
-        onDidRename(callback) {
-          if (isTar) onDidRenameCallback = callback;
+        onDidInvalidate() {
           return new Disposable();
         },
-        onDidDelete(callback) {
-          if (isTar) onDidDeleteCallback = callback;
+        onDidError() {
           return new Disposable();
-        },
-        getStartPromise() {
-          return Promise.resolve();
         },
         dispose() {},
       };
@@ -151,7 +150,7 @@ describe("ArchiveEditorView", () => {
     });
   });
 
-  describe("when the file is renamed", () => {
+  describe("when the editor moves the file", () => {
     it("refreshes the view and updates the title", async () => {
       await condition(() => archiveEditorView.element.querySelectorAll(".entry").length > 0);
       spyOn(archiveEditorView, "refresh").and.callThrough();
@@ -161,9 +160,18 @@ describe("ArchiveEditorView", () => {
       // for so the spec does not depend on external UI being present.
       const didChangeTitle = jasmine.createSpy("didChangeTitle");
       archiveEditorView.onDidChangeTitle(didChangeTitle);
-      onDidRenameCallback();
-      expect(archiveEditorView.refresh).toHaveBeenCalled();
-      expect(didChangeTitle).toHaveBeenCalled();
+      const oldPath = archiveEditorView.getPath();
+      const newPath = path.join(path.dirname(oldPath), "moved.tar");
+      const rename = { oldPath, newPath, isDirectory: false };
+      const move = lumine.workspace.beginFileMove([rename]);
+      fs.renameSync(oldPath, newPath);
+      try {
+        await move.complete([rename]);
+        expect(archiveEditorView.refresh).toHaveBeenCalled();
+        expect(didChangeTitle).toHaveBeenCalled();
+      } finally {
+        fs.renameSync(newPath, oldPath);
+      }
     });
   });
 
@@ -173,12 +181,14 @@ describe("ArchiveEditorView", () => {
       const states = [];
       archiveEditorView.onDidChangeFileState((state) => states.push(state));
       expect(lumine.workspace.getActivePane().getItems().length).toBe(1);
-      onDidDeleteCallback();
+      const exists = spyOn(fs, "existsSync").and.returnValue(false);
+      onDidChangeCallback([{ action: "deleted", path: archiveEditorView.getPath() }]);
       expect(lumine.workspace.getActivePaneItem()).toBe(archiveEditorView);
       expect(archiveEditorView.getFileState()).toBe(lumine.FileState.REMOVED);
       expect(states).toEqual([lumine.FileState.REMOVED]);
 
-      onDidChangeCallback();
+      exists.and.callThrough();
+      onDidChangeCallback([{ action: "created", path: archiveEditorView.getPath() }]);
       expect(archiveEditorView.getFileState()).toBe(lumine.FileState.UNMODIFIED);
       expect(states).toEqual([lumine.FileState.REMOVED, lumine.FileState.UNMODIFIED]);
     });
@@ -186,7 +196,8 @@ describe("ArchiveEditorView", () => {
     it("destroys the view when core.closeDeletedFileTabs is enabled", async () => {
       await condition(() => archiveEditorView.element.querySelectorAll(".entry").length > 0);
       lumine.config.set("core.closeDeletedFileTabs", true);
-      onDidDeleteCallback();
+      spyOn(fs, "existsSync").and.returnValue(false);
+      onDidChangeCallback([{ action: "deleted", path: archiveEditorView.getPath() }]);
       expect(lumine.workspace.getActivePaneItem()).toBeUndefined();
     });
   });

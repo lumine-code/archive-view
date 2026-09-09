@@ -2,8 +2,7 @@
 const fs = require("fs");
 const path = require("path");
 const humanize = require("humanize-plus");
-const lumineAPI = require("lumine");
-const { CompositeDisposable, Disposable, Emitter, FileState } = lumineAPI;
+const { CompositeDisposable, Disposable, Emitter, FileState, watchFile } = require("lumine");
 const etch = require("@lumine-code/etch");
 
 const archive = require("./archive");
@@ -16,31 +15,26 @@ module.exports = class ArchiveEditorView {
     this.emitter = new Emitter();
     this.path = archivePath;
     this.fileState = fs.existsSync(this.path) ? FileState.UNMODIFIED : FileState.REMOVED;
-    // Called off the module object so a spec can spy on `watchFile`.
-    this.file = lumineAPI.watchFile(this.path);
+    this.fileOperationDepth = 0;
+    this.fileSubscriptions = new CompositeDisposable();
     this.entries = [];
     etch.initialize(this);
 
     this.refresh();
 
-    this.disposables.add(this.file);
+    this.watchFile();
     this.disposables.add(
-      this.file.onDidChange(() => {
-        if (fs.existsSync(this.path)) this.setFileState(FileState.UNMODIFIED);
-        this.refresh();
-      }),
-    );
-    this.disposables.add(
-      this.file.onDidRename((newPath) => {
-        if (newPath) this.path = newPath;
-        this.setFileState(fs.existsSync(this.path) ? FileState.UNMODIFIED : FileState.REMOVED);
-        this.emitter.emit("did-change-title");
-        this.refresh();
-      }),
-    );
-    this.disposables.add(
-      this.file.onDidDelete(() => {
-        this.setFileState(FileState.REMOVED);
+      lumine.workspace.registerFileDocument({
+        owner: this,
+        getPath: () => this.path,
+        setPath: (nextPath) => this.setPath(nextPath),
+        beginFileOperation: () => {
+          this.fileOperationDepth++;
+        },
+        endFileOperation: () => {
+          this.fileOperationDepth--;
+          this.reconcileFile();
+        },
       }),
     );
 
@@ -53,6 +47,42 @@ module.exports = class ArchiveEditorView {
   }
 
   update() {}
+
+  watchFile() {
+    this.fileSubscriptions.dispose();
+    this.fileSubscriptions = new CompositeDisposable();
+    const file = watchFile(this.path);
+    this.file = file;
+    const reconcile = () => {
+      if (this.file === file) this.reconcileFile();
+    };
+    this.fileSubscriptions.add(
+      file,
+      file.onDidChange(reconcile),
+      file.onDidInvalidate(reconcile),
+      file.onDidError((error) => console.error("Unable to watch archive", error)),
+    );
+    file.ready.then(reconcile, () => {});
+  }
+
+  setPath(nextPath) {
+    if (nextPath === this.path) return;
+    this.path = nextPath;
+    this.watchFile();
+    this.emitter.emit("did-change-path", nextPath);
+    this.emitter.emit("did-change-title");
+  }
+
+  onDidChangePath(callback) {
+    return this.emitter.on("did-change-path", callback);
+  }
+
+  reconcileFile() {
+    if (this.destroyed || this.fileOperationDepth) return;
+    const exists = fs.existsSync(this.path);
+    this.setFileState(exists ? FileState.UNMODIFIED : FileState.REMOVED);
+    if (exists) this.refresh();
+  }
 
   render() {
     return (
@@ -77,6 +107,8 @@ module.exports = class ArchiveEditorView {
   }
 
   destroy() {
+    this.destroyed = true;
+    this.fileSubscriptions.dispose();
     while (this.entries.length > 0) {
       this.entries.pop().destroy();
     }
