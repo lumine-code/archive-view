@@ -182,6 +182,7 @@ describe("ArchiveEditorView", () => {
       const newPath = path.join(path.dirname(oldPath), "moved.tar");
       const rename = { oldPath, newPath, isDirectory: false };
       const move = lumine.workspace.beginFileMove([rename]);
+      await move.ready;
       fs.renameSync(oldPath, newPath);
       try {
         await move.complete([rename]);
