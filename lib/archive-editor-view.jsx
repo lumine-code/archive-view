@@ -18,6 +18,7 @@ module.exports = class ArchiveEditorView {
     this.fileOperationDepth = 0;
     this.fileSubscriptions = new CompositeDisposable();
     this.entries = [];
+    this.summary = "";
     etch.initialize(this);
 
     this.refresh();
@@ -94,7 +95,6 @@ module.exports = class ArchiveEditorView {
           >{`Loading archive\u2026`}</div>
           <div ref="errorMessage" className="padded icon icon-alert text-error" />
           <div className="inset-panel">
-            <div ref="summary" className="panel-heading" />
             <ol ref="tree" className="archive-tree padded list-tree has-collapsable-children" />
           </div>
         </div>
@@ -159,7 +159,7 @@ module.exports = class ArchiveEditorView {
   }
 
   refresh() {
-    this.refs.summary.style.display = "none";
+    this.setSummary("");
     this.refs.tree.style.display = "none";
     this.refs.loadingMessage.style.display = "";
     this.refs.errorMessage.style.display = "none";
@@ -224,7 +224,6 @@ module.exports = class ArchiveEditorView {
     const directoryLabel =
       directoryCount === 1 ? "1 folder" : `${humanize.intComma(directoryCount)} folders`;
 
-    this.refs.summary.style.display = "";
     let fileSize;
     try {
       fileSize = fs.statSync(this.path)?.size;
@@ -232,7 +231,21 @@ module.exports = class ArchiveEditorView {
       // The summary can still render when the archive path is unavailable.
     }
     if (fileSize == null) fileSize = -1;
-    this.refs.summary.textContent = `${humanize.fileSize(fileSize)} with ${fileLabel} and ${directoryLabel}`;
+    this.setSummary(`${humanize.fileSize(fileSize)} with ${fileLabel} and ${directoryLabel}`);
+  }
+
+  getSummary() {
+    return this.summary;
+  }
+
+  setSummary(summary) {
+    if (summary === this.summary) return;
+    this.summary = summary;
+    this.emitter.emit("did-change-summary", summary);
+  }
+
+  onDidChangeSummary(callback) {
+    return this.emitter.on("did-change-summary", callback);
   }
 
   focusSelectedFile() {

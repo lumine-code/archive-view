@@ -1,5 +1,5 @@
 .archive-editor {
-  background-color: var(--inset-panel-background-color);
+  background-color: var(--pane-item-background-color);
   overflow: auto;
   contain: strict;
 
@@ -9,13 +9,27 @@
 
     .inset-panel {
       border-width: 0;
-
-      .panel-heading {
-        border-radius: 0;
-      }
+      background-color: var(--pane-item-background-color);
 
       .archive-tree {
         padding: 5px;
+
+        .entry:not(.selected) {
+          &.list-item:hover::before,
+          &.list-nested-item:has(> .list-item:hover)::before {
+            content: "";
+            position: absolute;
+            right: 0;
+            left: 0;
+            height: var(--component-line-height);
+            background-color: var(--background-color-highlight);
+          }
+
+          &.list-item:hover > *,
+          &.list-nested-item:has(> .list-item:hover) > .list-item {
+            position: relative;
+          }
+        }
       }
     }
   }

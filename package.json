@@ -44,6 +44,13 @@
       }
     }
   },
+  "consumedServices": {
+    "status-bar": {
+      "versions": {
+        "^1.0.0": "consumeStatusBar"
+      }
+    }
+  },
   "dependencies": {
     "@lumine-code/etch": "github:lumine-code/etch#e2736a828e195b7f4878224c03391244c7404ee6",
     "@lumine-code/ls-archive": "github:lumine-code/node-ls-archive#e0005407ad1ed3b69131c8fb04d37bc68edd6b58",

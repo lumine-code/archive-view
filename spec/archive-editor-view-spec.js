@@ -94,16 +94,22 @@ describe("ArchiveEditorView", () => {
 
   describe("archive summary", () => {
     beforeEach(async () => {
+      jasmine.attachToDOM(lumine.views.getView(lumine.workspace));
+      await lumine.packages.activatePackage("status-bar");
       await lumine.workspace.open("multiple-entries.zip");
       archiveEditorView = lumine.workspace.getActivePaneItem();
-      jasmine.attachToDOM(lumine.views.getView(lumine.workspace));
     });
 
     it("shows correct statistics", async () => {
       await condition(() => archiveEditorView.element.querySelectorAll(".entry").length > 0);
-      const heading = archiveEditorView.element.querySelector(".inset-panel .panel-heading");
-      expect(heading).not.toBe(null);
-      expect(heading.textContent).toBe("704 bytes with 4 files and 1 folder");
+      await condition(() => document.querySelector("status-bar .archive-status") != null);
+      const status = document.querySelector("status-bar .archive-status");
+      expect(archiveEditorView.element.querySelector(".panel-heading")).toBe(null);
+      expect(status).not.toBe(null);
+      expect(status.textContent).toBe("704 bytes with 4 files and 1 folder");
+
+      await lumine.workspace.open();
+      expect(status.style.display).toBe("none");
     });
   });
 
