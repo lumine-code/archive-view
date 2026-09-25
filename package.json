@@ -27,9 +27,6 @@
   "engines": {
     "lumine": "^1.0.0"
   },
-  "backgroundTips": [
-    "You can open a .zip, .tar, .jar, or .whl archive from the tree view and browse its contents in a tab."
-  ],
   "scripts": {
     "test": "lumine --test spec",
     "lint": "eslint . --max-warnings 0",
@@ -39,6 +36,13 @@
   "deserializers": {
     "ArchiveEditor": "deserialize",
     "ArchiveEditorView": "deserialize"
+  },
+  "providedServices": {
+    "background-tips.provider": {
+      "versions": {
+        "1.0.0": "provideBackgroundTips"
+      }
+    }
   },
   "dependencies": {
     "@lumine-code/etch": "github:lumine-code/etch#e2736a828e195b7f4878224c03391244c7404ee6",
