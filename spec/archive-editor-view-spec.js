@@ -61,9 +61,9 @@ describe("ArchiveEditorView", () => {
       expect(fileElements[2].textContent).toBe("fa.txt");
     });
 
-    it("selects the first file", async () => {
+    it("does not select a file", async () => {
       await condition(() => archiveEditorView.element.querySelectorAll(".entry").length > 0);
-      expect(archiveEditorView.element.querySelector(".selected").textContent).toBe("f1.txt");
+      expect(archiveEditorView.element.querySelector(".selected")).toBe(null);
     });
   });
 
@@ -116,7 +116,9 @@ describe("ArchiveEditorView", () => {
   describe("when core:move-up/core:move-down is triggered", () => {
     let selectedEntry;
     const dispatch = (command) => {
-      lumine.commands.dispatch(archiveEditorView.element.querySelector(".selected"), command);
+      const target =
+        archiveEditorView.element.querySelector(".selected") ?? archiveEditorView.element;
+      lumine.commands.dispatch(target, command);
       selectedEntry = archiveEditorView.element.querySelector(".selected").textContent;
       return true;
     };
@@ -124,12 +126,32 @@ describe("ArchiveEditorView", () => {
     it("selects the next/previous file", async () => {
       await condition(() => archiveEditorView.element.querySelectorAll(".entry").length > 0);
       expect(archiveEditorView.element).toBeDefined();
-      dispatch("core:move-up") && expect(selectedEntry).toBe("f1.txt");
+      dispatch("core:move-down") && expect(selectedEntry).toBe("f1.txt");
       dispatch("core:move-down") && expect(selectedEntry).toBe("f2.txt");
       dispatch("core:move-down") && expect(selectedEntry).toBe("fa.txt");
       dispatch("core:move-down") && expect(selectedEntry).toBe("fa.txt");
       dispatch("core:move-up") && expect(selectedEntry).toBe("f2.txt");
       dispatch("core:move-up") && expect(selectedEntry).toBe("f1.txt");
+    });
+
+    it("selects the last file when moving up without a selection", async () => {
+      await condition(() => archiveEditorView.element.querySelectorAll(".entry").length > 0);
+      dispatch("core:move-up");
+      expect(selectedEntry).toBe("fa.txt");
+    });
+  });
+
+  describe("when the archive background is clicked", () => {
+    it("clears the keyboard selection", async () => {
+      await condition(() => archiveEditorView.element.querySelectorAll(".entry").length > 0);
+      lumine.commands.dispatch(archiveEditorView.element, "core:move-down");
+      expect(archiveEditorView.element.querySelector(".selected").textContent).toBe("f1.txt");
+      spyOn(archiveEditorView.element, "focus");
+
+      archiveEditorView.refs.tree.click();
+
+      expect(archiveEditorView.element.querySelector(".selected")).toBe(null);
+      expect(archiveEditorView.element.focus).toHaveBeenCalled();
     });
   });
 
@@ -137,6 +159,7 @@ describe("ArchiveEditorView", () => {
     it("copies the contents to a temp file and opens it in a new editor", async () => {
       await condition(() => archiveEditorView.element.querySelectorAll(".entry").length > 0);
       archiveEditorView.element.querySelectorAll(".file")[2].click();
+      expect(archiveEditorView.element.querySelector(".selected")).toBe(null);
       await condition(() => lumine.workspace.getActivePane().getItems().length > 1);
       expect(lumine.workspace.getActivePaneItem().getText()).toBe("hey there\n");
       expect(lumine.workspace.getActivePaneItem().getTitle()).toBe("fa.txt");
@@ -158,7 +181,11 @@ describe("ArchiveEditorView", () => {
   describe("when core:confirm is triggered", () => {
     it("copies the contents to a temp file and opens it in a new editor", async () => {
       await condition(() => archiveEditorView.element.querySelectorAll(".entry").length > 0);
-      lumine.commands.dispatch(archiveEditorView.element.querySelector(".file"), "core:confirm");
+      lumine.commands.dispatch(archiveEditorView.element, "core:move-down");
+      lumine.commands.dispatch(
+        archiveEditorView.element.querySelector(".selected"),
+        "core:confirm",
+      );
       await condition(() => lumine.workspace.getActivePane().getItems().length > 1);
       expect(lumine.workspace.getActivePaneItem().getText()).toBe("");
       expect(lumine.workspace.getActivePaneItem().getTitle()).toBe("f1.txt");

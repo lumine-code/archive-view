@@ -18,6 +18,7 @@ module.exports = class ArchiveEditorView {
     this.fileOperationDepth = 0;
     this.fileSubscriptions = new CompositeDisposable();
     this.entries = [];
+    this.selectedFile = null;
     this.summary = "";
     etch.initialize(this);
 
@@ -40,10 +41,36 @@ module.exports = class ArchiveEditorView {
     );
 
     const focusHandler = () => this.focusSelectedFile();
+    const clickHandler = (event) => {
+      if (event.target.closest(".list-item")) return;
+      this.clearSelection();
+      this.element.focus();
+    };
 
     this.element.addEventListener("focus", focusHandler);
+    this.element.addEventListener("click", clickHandler);
     this.disposables.add(
-      new Disposable(() => this.element.removeEventListener("focus", focusHandler)),
+      new Disposable(() => {
+        this.element.removeEventListener("focus", focusHandler);
+        this.element.removeEventListener("click", clickHandler);
+      }),
+      lumine.commands.add(this.element, {
+        "core:confirm": () => this.selectedFile?.openFile(),
+        "core:move-down": () => {
+          if (this.selectedFile) {
+            this.selectedFile.parentView.selectFileAfterIndex(this.selectedFile.indexInParentView);
+          } else {
+            this.selectFileAfterIndex(-1);
+          }
+        },
+        "core:move-up": () => {
+          if (this.selectedFile) {
+            this.selectedFile.parentView.selectFileBeforeIndex(this.selectedFile.indexInParentView);
+          } else {
+            this.selectFileBeforeIndex(this.entries.length);
+          }
+        },
+      }),
     );
   }
 
@@ -189,6 +216,7 @@ module.exports = class ArchiveEditorView {
   }
 
   createTreeEntries(entries) {
+    this.clearSelection();
     while (this.entries.length > 0) {
       this.entries.pop().destroy();
     }
@@ -205,10 +233,6 @@ module.exports = class ArchiveEditorView {
       index++;
     }
 
-    this.selectFileAfterIndex(-1);
-
-    // Wait until selecting (focusing) the first file before appending the entries
-    // to avoid a double-forced reflow when focusing.
     for (const entry of this.entries) {
       this.refs.tree.appendChild(entry.element);
     }
@@ -249,10 +273,22 @@ module.exports = class ArchiveEditorView {
   }
 
   focusSelectedFile() {
-    const selectedFile = this.refs.tree.querySelector(".selected");
-    if (selectedFile) {
-      selectedFile.focus();
-    }
+    if (!this.selectedFile) return false;
+    this.selectedFile.element.focus();
+    return true;
+  }
+
+  selectFile(file) {
+    this.clearSelection();
+    this.selectedFile = file;
+    file.element.classList.add("selected");
+    file.element.focus();
+  }
+
+  clearSelection() {
+    if (!this.selectedFile) return;
+    this.selectedFile.element.classList.remove("selected");
+    this.selectedFile = null;
   }
 
   selectFileBeforeIndex(index) {
@@ -284,6 +320,6 @@ module.exports = class ArchiveEditorView {
   }
 
   focus() {
-    this.focusSelectedFile();
+    if (!this.focusSelectedFile()) this.element.focus();
   }
 };
