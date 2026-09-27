@@ -52,9 +52,9 @@
     }
   },
   "dependencies": {
-    "@lumine-code/etch": "github:lumine-code/etch#e2736a828e195b7f4878224c03391244c7404ee6",
-    "@lumine-code/ls-archive": "github:lumine-code/node-ls-archive#e0005407ad1ed3b69131c8fb04d37bc68edd6b58",
-    "@lumine-code/temp": "github:lumine-code/node-temp#bbd9e24a78e835e7421c8acec360731eafa4d3f6",
+    "@lumine-code/etch": "github:lumine-code/etch#27015c2cc9cfe68f8f036923badaaee86ffd08e9",
+    "@lumine-code/ls-archive": "github:lumine-code/node-ls-archive#e543c959e82c3359458daec94b232c4f8a8b2f18",
+    "@lumine-code/temp": "github:lumine-code/node-temp#d952dc119d4dda6918a37c414302e6eb1dc9789d",
     "humanize-plus": "~1.8.2"
   },
   "devDependencies": {
