@@ -2,7 +2,7 @@
 const fs = require("fs");
 const path = require("path");
 const humanize = require("humanize-plus");
-const { CompositeDisposable, Disposable, Emitter, FileState, watchFile } = require("lumine");
+const { CompositeDisposable, Disposable, Emitter, watchFile } = require("lumine");
 const etch = require("@lumine-code/etch");
 
 const archive = require("./archive");
@@ -14,7 +14,7 @@ module.exports = class ArchiveEditorView {
     this.disposables = new CompositeDisposable();
     this.emitter = new Emitter();
     this.path = archivePath;
-    this.fileState = fs.existsSync(this.path) ? FileState.UNMODIFIED : FileState.REMOVED;
+    this.fileState = fs.existsSync(this.path) ? "unmodified" : "removed";
     this.fileOperationDepth = 0;
     this.fileSubscriptions = new CompositeDisposable();
     this.entries = [];
@@ -108,7 +108,7 @@ module.exports = class ArchiveEditorView {
   reconcileFile() {
     if (this.destroyed || this.fileOperationDepth) return;
     const exists = fs.existsSync(this.path);
-    this.setFileState(exists ? FileState.UNMODIFIED : FileState.REMOVED);
+    this.setFileState(exists ? "unmodified" : "removed");
     if (exists) this.refresh();
   }
 

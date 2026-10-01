@@ -236,13 +236,13 @@ describe("ArchiveEditorView", () => {
       const exists = spyOn(fs, "existsSync").and.returnValue(false);
       onDidChangeCallback([{ action: "deleted", path: archiveEditorView.getPath() }]);
       expect(lumine.workspace.getActivePaneItem()).toBe(archiveEditorView);
-      expect(archiveEditorView.getFileState()).toBe(lumine.FileState.REMOVED);
-      expect(states).toEqual([lumine.FileState.REMOVED]);
+      expect(archiveEditorView.getFileState()).toBe("removed");
+      expect(states).toEqual(["removed"]);
 
       exists.and.callThrough();
       onDidChangeCallback([{ action: "created", path: archiveEditorView.getPath() }]);
-      expect(archiveEditorView.getFileState()).toBe(lumine.FileState.UNMODIFIED);
-      expect(states).toEqual([lumine.FileState.REMOVED, lumine.FileState.UNMODIFIED]);
+      expect(archiveEditorView.getFileState()).toBe("unmodified");
+      expect(states).toEqual(["removed", "unmodified"]);
     });
 
     it("destroys the view when core.closeDeletedFileTabs is enabled", async () => {
