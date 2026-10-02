@@ -1,11 +1,11 @@
 /** @jsx etch.dom */
 const fs = require("fs");
 const path = require("path");
-const humanize = require("humanize-plus");
 const { CompositeDisposable, Disposable, Emitter, watchFile } = require("lumine");
 const etch = require("@lumine-code/etch");
 
 const archive = require("./archive");
+const { formatCount, formatFileSize } = require("./format-summary");
 const FileView = require("./file-view");
 const DirectoryView = require("./directory-view");
 
@@ -242,11 +242,11 @@ module.exports = class ArchiveEditorView {
 
   updateSummary() {
     const fileCount = this.entries.filter((entry) => entry instanceof FileView).length;
-    const fileLabel = fileCount === 1 ? "1 file" : `${humanize.intComma(fileCount)} files`;
+    const fileLabel = fileCount === 1 ? "1 file" : `${formatCount(fileCount)} files`;
 
     const directoryCount = this.entries.filter((entry) => entry instanceof DirectoryView).length;
     const directoryLabel =
-      directoryCount === 1 ? "1 folder" : `${humanize.intComma(directoryCount)} folders`;
+      directoryCount === 1 ? "1 folder" : `${formatCount(directoryCount)} folders`;
 
     let fileSize;
     try {
@@ -255,7 +255,7 @@ module.exports = class ArchiveEditorView {
       // The summary can still render when the archive path is unavailable.
     }
     if (fileSize == null) fileSize = -1;
-    this.setSummary(`${humanize.fileSize(fileSize)} with ${fileLabel} and ${directoryLabel}`);
+    this.setSummary(`${formatFileSize(fileSize)} with ${fileLabel} and ${directoryLabel}`);
   }
 
   getSummary() {
