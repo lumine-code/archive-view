@@ -92,6 +92,32 @@ describe("ArchiveEditorView", () => {
     });
   });
 
+  describe(".refresh()", () => {
+    it("preserves the scroll offset when refreshing a copy of the same archive", async () => {
+      jasmine.attachToDOM(lumine.views.getView(lumine.workspace));
+      const copy = archiveEditorView.copy();
+      try {
+        await lumine.workspace.open(copy);
+        expect(await copy.refresh()).toBe(true);
+        const element = copy.element;
+        const tree = copy.refs.tree;
+        tree.style.minHeight = "1200px";
+        element.style.height = "100px";
+        element.scrollTop = 75;
+        const scrollTop = element.scrollTop;
+        expect(scrollTop).toBeGreaterThan(0);
+
+        expect(await copy.refresh()).toBe(true);
+
+        expect(copy.element).toBe(element);
+        expect(copy.refs.tree).toBe(tree);
+        expect(element.scrollTop).toBe(scrollTop);
+      } finally {
+        copy.destroy();
+      }
+    });
+  });
+
   describe("archive summary", () => {
     beforeEach(async () => {
       jasmine.attachToDOM(lumine.views.getView(lumine.workspace));

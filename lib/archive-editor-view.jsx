@@ -403,7 +403,7 @@ module.exports = class ArchiveEditorView {
       this.path = filePath;
       this.observedDiskFingerprint = this.fingerprintForStats(staged.stats);
       this.installFileWatcher(watcher);
-      this.commitTreeEntries(staged.tree);
+      this.commitTreeEntries(staged.tree, { resetScroll: true });
       committed = true;
       this.setFileState("unmodified");
       if (oldURI !== filePath) {
@@ -505,7 +505,7 @@ module.exports = class ArchiveEditorView {
     }
   }
 
-  commitTreeEntries(tree) {
+  commitTreeEntries(tree, { resetScroll = false } = {}) {
     const hadFocus = this.element.contains(document.activeElement);
     const oldEntries = this.entries;
     this.resourceVersion++;
@@ -516,8 +516,10 @@ module.exports = class ArchiveEditorView {
     this.refs.tree.style.display = "";
     this.refs.loadingMessage.style.display = "none";
     this.refs.errorMessage.style.display = "none";
-    this.element.scrollTop = 0;
-    this.refs.tree.scrollTop = 0;
+    if (resetScroll) {
+      this.element.scrollTop = 0;
+      this.refs.tree.scrollTop = 0;
+    }
     this.disposeEntries(oldEntries);
     this.setSummary(tree.summary);
     if (hadFocus) this.element.focus();
