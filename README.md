@@ -8,6 +8,7 @@ Browse the files and folders inside archive files.
 - **Broad format support**: handles `.egg`, `.epub`, `.jar`, `.love`, `.nupkg`, `.tar`, `.tar.gz`, `.tgz`, `.war`, `.whl`, `.xpi`, and `.zip` files.
 - **Extract and open**: selecting a file extracts it to a temporary file and opens it in a new editor.
 - **File icons**: shows a file-type icon for every entry, and richer ones when an icon package is installed.
+- **Pending previews**: reuses the existing browser when another archive replaces a temporary preview, keeping the previous contents on loading failure.
 
 ## Installation
 

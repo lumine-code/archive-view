@@ -1,12 +1,16 @@
 const path = require("path");
-const ArchiveEditor = require("../lib/archive-editor");
-const ArchiveEditorView = require("../lib/archive-editor-view");
 
 describe("ArchiveEditor", () => {
   const tarPath = path.join(__dirname, "fixtures", "nested.tar");
+  let ArchiveEditor, ArchiveEditorView;
 
   // Don't log during specs
-  beforeEach(() => spyOn(console, "warn"));
+  beforeEach(async () => {
+    spyOn(console, "warn");
+    const pack = await lumine.packages.activatePackage("archive-view");
+    ArchiveEditor = pack.mainModule;
+    ArchiveEditorView = require("../lib/archive-editor-view");
+  });
 
   describe(".deserialize", () => {
     it("returns undefined if no file exists at the given path", () => {
@@ -28,7 +32,6 @@ describe("ArchiveEditor", () => {
       const getArchiveEditorViews = () => {
         return lumine.workspace.getPaneItems().filter((item) => item instanceof ArchiveEditorView);
       };
-      await lumine.packages.activatePackage("archive-view");
       await lumine.workspace.open(path.join(__dirname, "fixtures", "nested.tar"));
       await lumine.workspace.open(path.join(__dirname, "fixtures", "invalid.zip"));
       await lumine.workspace.open();
