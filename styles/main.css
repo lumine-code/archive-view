@@ -21,7 +21,7 @@
             position: absolute;
             right: 0;
             left: 0;
-            height: var(--component-line-height);
+            height: var(--ui-control-height);
             background-color: var(--background-color-highlight);
           }
 
