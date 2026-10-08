@@ -2,6 +2,8 @@
 
 Browse the files and folders inside archive files.
 
+Fork of [pulsar-edit/pulsar](https://github.com/pulsar-edit/pulsar) (`packages/archive-view`).
+
 ## Features
 
 - **Archive browsing**: opens archives as a tree of their contents inside an editor tab.
