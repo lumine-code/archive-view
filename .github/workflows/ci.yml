@@ -44,6 +44,8 @@ jobs:
         run: npm run lint
       - name: Check formatting
         run: npm run format:check
+      - name: Audit dependencies
+        run: npm audit --audit-level=moderate
       - name: Check package contents
         run: npm pack --dry-run
 
@@ -62,7 +64,17 @@ jobs:
         shell: bash
     env:
       LUMINE_JASMINE_REPORTER: list
+      LUMINE_DISABLE_SHELLING_OUT_FOR_ENVIRONMENT: "true"
+      LUMINE_HOME: ${{ github.workspace }}/archive-spec-home
+      HOME: ${{ github.workspace }}/archive-spec-home
+      USERPROFILE: ${{ github.workspace }}/archive-spec-home
+      XDG_CONFIG_HOME: ${{ github.workspace }}/archive-spec-home
+      TEMP: ${{ github.workspace }}/archive-spec-tmp
+      TMP: ${{ github.workspace }}/archive-spec-tmp
+      TMPDIR: ${{ github.workspace }}/archive-spec-tmp
     steps:
+      - name: Create the private home and temporary directory
+        run: mkdir -p "$TEMP" "$LUMINE_HOME/electronUserData"
       - name: Enable Git symlinks on Windows
         if: runner.os == 'Windows'
         run: git config --global core.symlinks true

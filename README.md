@@ -12,6 +12,8 @@ Fork of [pulsar-edit/pulsar](https://github.com/pulsar-edit/pulsar) (`packages/a
 - **File icons**: shows a file-type icon for every entry, and richer ones when an icon package is installed.
 - **Pending previews**: reuses the existing browser when another archive replaces a temporary preview, keeping the previous contents on loading failure.
 
+Keyboard navigation follows expanded branches and skips collapsed folders.
+
 ## Installation
 
 To install `archive-view` search for it in the Install pane of the Lumine settings, or run the command `lumine --install lumine-code/archive-view`.
