@@ -538,7 +538,11 @@ describe("Archive pending item reuse", () => {
 
   it("leaves remote archive URIs to the remaining openers", async () => {
     const remoteURI = "https://archive.example/document.zip";
-    const remote = { getURI: () => remoteURI, element: document.createElement("div") };
+    const remote = {
+      getURI: () => remoteURI,
+      element: document.createElement("div"),
+      isSingleton: () => true,
+    };
     const replace = spyOn(view, "replaceArchive").and.callThrough();
     const registration = workspace.addOpener((uri) => (uri === remoteURI ? remote : undefined));
     try {

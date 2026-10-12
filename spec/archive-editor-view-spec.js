@@ -76,6 +76,37 @@ describe("ArchiveEditorView", () => {
         newArchiveView.destroy();
       }
     });
+
+    it("copies the loaded tree and local selection without rereading or owning its sibling DOM", async () => {
+      jasmine.attachToDOM(lumine.workspace.getElement());
+      await condition(() => archiveEditorView.loaded);
+      const sourceDirectory = archiveEditorView.entries[0];
+      sourceDirectory.element.classList.add("collapsed");
+      const findFile = (entries) => {
+        for (const entry of entries) {
+          const file = entry.entries ? findFile(entry.entries) : entry;
+          if (file) return file;
+        }
+      };
+      const sourceFile = findFile(archiveEditorView.entries);
+      archiveEditorView.selectedFile = sourceFile;
+      sourceFile.element.classList.add("selected");
+      const listing = spyOn(require("../lib/archive"), "list").and.callThrough();
+      const copy = archiveEditorView.copy();
+      try {
+        expect(listing).not.toHaveBeenCalled();
+        expect(copy.selectedFile.entry.getPath()).toBe(sourceFile.entry.getPath());
+        expect(copy.selectedFile).not.toBe(sourceFile);
+        expect(copy.entries[0].element.classList.contains("collapsed")).toBe(true);
+        copy.entries[0].element.classList.remove("collapsed");
+        expect(sourceDirectory.element.classList.contains("collapsed")).toBe(true);
+        archiveEditorView.destroy();
+        expect(copy.destroyed).toBe(false);
+        expect(copy.entries[0].destroyed).toBe(false);
+      } finally {
+        copy.destroy();
+      }
+    });
   });
 
   describe(".destroy()", () => {

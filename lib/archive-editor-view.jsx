@@ -10,7 +10,7 @@ const FileView = require("./file-view");
 const DirectoryView = require("./directory-view");
 
 module.exports = class ArchiveEditorView {
-  constructor(archivePath) {
+  constructor(archivePath, { entries, viewState } = {}) {
     this.disposables = new CompositeDisposable();
     this.emitter = new Emitter();
     this.path = archivePath;
@@ -78,7 +78,13 @@ module.exports = class ArchiveEditorView {
         },
       }),
     );
-    this.refresh();
+    if (entries) {
+      this.createTreeEntries(entries);
+      this.restoreViewState(viewState);
+    } else {
+      this.pendingViewState = viewState;
+      this.refresh();
+    }
   }
 
   update() {}
@@ -206,8 +212,66 @@ module.exports = class ArchiveEditorView {
     );
   }
 
-  copy() {
-    return new ArchiveEditorView(this.path);
+  copy({ signal } = {}) {
+    signal?.throwIfAborted();
+    if (this.destroyed) throw new Error("Cannot copy a destroyed archive view");
+    return new ArchiveEditorView(this.path, {
+      entries: this.loaded ? this.entries.map((entry) => entry.entry) : undefined,
+      viewState: this.captureViewState(),
+    });
+  }
+
+  getPaneItemRevision() {
+    return this.resourceVersion;
+  }
+
+  captureViewState() {
+    const collapsedPaths = [];
+    const collect = (entries) => {
+      for (const view of entries) {
+        if (view instanceof DirectoryView) {
+          if (view.element.classList.contains("collapsed"))
+            collapsedPaths.push(view.entry.getPath());
+          collect(view.entries);
+        }
+      }
+    };
+    collect(this.entries);
+    return {
+      collapsedPaths,
+      selectedPath: this.selectedFile?.entry.getPath(),
+      scrollTop: this.element.scrollTop,
+      treeScrollTop: this.refs.tree.scrollTop,
+    };
+  }
+
+  restoreViewState(state) {
+    if (!state) return;
+    const collapsed = new Set(state.collapsedPaths);
+    const restore = (entries) => {
+      for (const view of entries) {
+        if (view instanceof DirectoryView) {
+          view.element.classList.toggle("collapsed", collapsed.has(view.entry.getPath()));
+          restore(view.entries);
+        } else if (view.entry.getPath() === state.selectedPath) {
+          this.selectedFile = view;
+          view.element.classList.add("selected");
+        }
+      }
+    };
+    restore(this.entries);
+    const token = (this.scrollRestore = {});
+    const archivePath = this.path;
+    const scrollTop = this.element.scrollTop;
+    const treeScrollTop = this.refs.tree.scrollTop;
+    requestAnimationFrame(() => {
+      if (this.destroyed || this.scrollRestore !== token || this.path !== archivePath) return;
+      if (this.element.scrollTop !== scrollTop || this.refs.tree.scrollTop !== treeScrollTop)
+        return;
+      this.element.scrollTop = state.scrollTop;
+      this.refs.tree.scrollTop = state.treeScrollTop;
+      this.scrollRestore = null;
+    });
   }
 
   destroy() {
@@ -522,6 +586,10 @@ module.exports = class ArchiveEditorView {
     }
     this.disposeEntries(oldEntries);
     this.setSummary(tree.summary);
+    if (this.pendingViewState) {
+      this.restoreViewState(this.pendingViewState);
+      this.pendingViewState = null;
+    }
     if (hadFocus) this.element.focus();
   }
 
