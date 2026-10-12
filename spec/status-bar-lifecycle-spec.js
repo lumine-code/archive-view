@@ -2,6 +2,16 @@ const path = require("node:path");
 
 describe("Archive status service connection ownership", () => {
   let main, view, bars, providers, hub, consumer, StatusBarView;
+  const serviceFor = (bar) => ({
+    observeWindows(create) {
+      const window = lumine.workspace.getMainWindow();
+      return create(bar, {
+        window,
+        document: window.getDocument(),
+        editorContainer: window.getEditorContainer(),
+      });
+    },
+  });
   const tiles = (bar) =>
     bar
       .getLeftTiles()
@@ -20,7 +30,7 @@ describe("Archive status service connection ownership", () => {
     bars = [];
     providers = [];
     hub = new lumine.packages.serviceHub.constructor();
-    consumer = hub.consume("status-bar", "^1.0.0", (bar) => main.consumeStatusBar(bar));
+    consumer = hub.consume("status-bar", "^2.0.0", (bar) => main.consumeStatusBar(bar));
   });
   afterEach(async () => {
     consumer.dispose();
@@ -37,7 +47,7 @@ describe("Archive status service connection ownership", () => {
       bars.push(bar);
       jasmine.attachToDOM(bar.element);
     }
-    const provider = hub.provide("status-bar", "1.0.0", bar);
+    const provider = hub.provide("status-bar", "2.0.0", serviceFor(bar));
     providers.push(provider);
     return { bar, provider };
   }
@@ -85,7 +95,7 @@ describe("Archive status service connection ownership", () => {
   it("keeps a reacquired generation alive when an old manual lease ends", async () => {
     const bar = new StatusBarView();
     bars.push(bar);
-    const old = main.consumeStatusBar(bar);
+    const old = main.consumeStatusBar(serviceFor(bar));
     await lumine.packages.deactivatePackage("archive-view");
     ({ mainModule: main } = await lumine.packages.activatePackage("archive-view"));
     view = await lumine.workspace.open(path.join(__dirname, "fixtures", "nested.tar"));

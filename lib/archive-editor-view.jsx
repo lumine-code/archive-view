@@ -333,6 +333,7 @@ module.exports = class ArchiveEditorView {
     return {
       deserializer: this.constructor.name,
       path: this.path,
+      viewState: this.captureViewState(),
     };
   }
 
@@ -558,7 +559,7 @@ module.exports = class ArchiveEditorView {
 
   stageTreeEntries(entries, archivePath) {
     const views = [];
-    const fragment = document.createDocumentFragment();
+    const fragment = this.element.ownerDocument.createDocumentFragment();
     try {
       for (const [index, entry] of entries.entries()) {
         const EntryView = entry.isDirectory() ? DirectoryView : FileView;
@@ -584,7 +585,7 @@ module.exports = class ArchiveEditorView {
   }
 
   commitTreeEntries(tree, { resetScroll = false } = {}) {
-    const hadFocus = this.element.contains(document.activeElement);
+    const hadFocus = this.element.contains(this.element.ownerDocument.activeElement);
     const oldEntries = this.entries;
     this.resourceVersion++;
     this.clearSelection();
