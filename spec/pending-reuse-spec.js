@@ -541,7 +541,7 @@ describe("Archive pending item reuse", () => {
     const remote = {
       getURI: () => remoteURI,
       element: document.createElement("div"),
-      isSingleton: () => true,
+      canCopy: () => false,
     };
     const replace = spyOn(view, "replaceArchive").and.callThrough();
     const registration = workspace.addOpener((uri) => (uri === remoteURI ? remote : undefined));
