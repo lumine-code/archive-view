@@ -237,11 +237,18 @@ module.exports = class ArchiveEditorView {
       }
     };
     collect(this.entries);
+    const pending = this.scrollRestore?.archivePath === this.path ? this.scrollRestore : null;
     return {
       collapsedPaths,
       selectedPath: this.selectedFile?.entry.getPath(),
-      scrollTop: this.element.scrollTop,
-      treeScrollTop: this.refs.tree.scrollTop,
+      scrollTop:
+        pending && this.element.scrollTop === pending.scrollTop
+          ? pending.desiredScrollTop
+          : this.element.scrollTop,
+      treeScrollTop:
+        pending && this.refs.tree.scrollTop === pending.treeScrollTop
+          ? pending.desiredTreeScrollTop
+          : this.refs.tree.scrollTop,
     };
   }
 
@@ -260,17 +267,24 @@ module.exports = class ArchiveEditorView {
       }
     };
     restore(this.entries);
-    const token = (this.scrollRestore = {});
     const archivePath = this.path;
     const scrollTop = this.element.scrollTop;
     const treeScrollTop = this.refs.tree.scrollTop;
+    const token = (this.scrollRestore = {
+      archivePath,
+      scrollTop,
+      treeScrollTop,
+      desiredScrollTop: state.scrollTop,
+      desiredTreeScrollTop: state.treeScrollTop,
+    });
     requestAnimationFrame(() => {
-      if (this.destroyed || this.scrollRestore !== token || this.path !== archivePath) return;
+      if (this.scrollRestore !== token) return;
+      this.scrollRestore = null;
+      if (this.destroyed || this.path !== archivePath) return;
       if (this.element.scrollTop !== scrollTop || this.refs.tree.scrollTop !== treeScrollTop)
         return;
       this.element.scrollTop = state.scrollTop;
       this.refs.tree.scrollTop = state.treeScrollTop;
-      this.scrollRestore = null;
     });
   }
 

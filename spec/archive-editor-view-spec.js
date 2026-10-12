@@ -107,6 +107,36 @@ describe("ArchiveEditorView", () => {
         copy.destroy();
       }
     });
+
+    it("preserves the viewport through consecutive copies before the first paint", async () => {
+      jasmine.attachToDOM(lumine.workspace.getElement());
+      await condition(() => archiveEditorView.loaded);
+      const style = document.createElement("style");
+      style.textContent =
+        ".archive-editor { height: 100px !important; max-height: 100px; overflow: auto; } .archive-editor > ol { min-height: 1200px; }";
+      jasmine.attachToDOM(style);
+      archiveEditorView.refs.tree.style.minHeight = "1200px";
+      archiveEditorView.element.style.height = "100px";
+      archiveEditorView.element.scrollTop = 75;
+      expect(archiveEditorView.element.scrollTop).toBe(75);
+      const { item: first } = await lumine.workspace.copyPaneItem(archiveEditorView, {
+        splitDirection: "right",
+      });
+      const { item: second } = await lumine.workspace.copyPaneItem(first, {
+        splitDirection: "down",
+      });
+      try {
+        first.refs.tree.style.minHeight = second.refs.tree.style.minHeight = "1200px";
+        first.element.style.height = second.element.style.height = "100px";
+        await new Promise(requestAnimationFrame);
+        await new Promise(requestAnimationFrame);
+        expect(first.element.scrollTop).toBe(75);
+        expect(second.element.scrollTop).toBe(75);
+      } finally {
+        first.destroy();
+        second.destroy();
+      }
+    });
   });
 
   describe(".destroy()", () => {
