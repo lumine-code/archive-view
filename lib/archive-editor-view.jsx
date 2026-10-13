@@ -277,7 +277,7 @@ module.exports = class ArchiveEditorView {
       desiredScrollTop: state.scrollTop,
       desiredTreeScrollTop: state.treeScrollTop,
     });
-    requestAnimationFrame(() => {
+    this.element.ownerDocument.defaultView.requestAnimationFrame(() => {
       if (this.scrollRestore !== token) return;
       this.scrollRestore = null;
       if (this.destroyed || this.path !== archivePath) return;
