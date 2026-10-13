@@ -415,14 +415,19 @@ module.exports = class ArchiveEditorView {
     if (this.currentRequest === request) this.currentRequest = null;
   }
 
-  readArchiveEntries(filePath) {
+  readArchiveEntries(filePath, request) {
     return new Promise((resolve, reject) => {
       // The pinned archive library exposes no cancellation handle. A cancelled
       // request stops awaiting this promise and never touches the view later.
-      archive.list(filePath, { tree: true }, (error, entries) => {
-        if (error) reject(error instanceof Error ? error : new Error(String(error)));
-        else resolve(entries);
-      });
+      archive.list(
+        filePath,
+        { tree: true },
+        (error, entries) => {
+          if (error) reject(error instanceof Error ? error : new Error(String(error)));
+          else resolve(entries);
+        },
+        () => !this.destroyed && !request.controller.signal.aborted,
+      );
     });
   }
 
@@ -431,7 +436,7 @@ module.exports = class ArchiveEditorView {
       if (watcher) watcher.changed = false;
       const [entries, stats] = await this.waitForRequest(
         Promise.all([
-          this.readArchiveEntries(filePath),
+          this.readArchiveEntries(filePath, request),
           fs.promises.stat(filePath),
           watcher ? watcher.ready : this.watcherReady,
         ]),
