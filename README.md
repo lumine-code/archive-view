@@ -14,6 +14,8 @@ Fork of [pulsar-edit/pulsar](https://github.com/pulsar-edit/pulsar) (`packages/a
 
 Keyboard navigation follows expanded branches and skips collapsed folders.
 
+![Browse source files and sample data inside a ZIP archive.](.github/demo.png)
+
 ## Installation
 
 To install `archive-view` search for it in the Install pane of the Lumine settings, or run the command `lumine --install lumine-code/archive-view`.

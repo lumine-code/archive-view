@@ -1,0 +1,16 @@
+{
+  "title": "archive-view",
+  "description": "Browse source files and sample data inside a ZIP archive.",
+  "recordedOn": "2026-10-13",
+  "sourceRevision": "7a9ebf445c921e7b167d9aef3d2512d0a7b4ab0b",
+  "mode": "normal",
+  "fontSettings": "default",
+  "images": [
+    {
+      "file": "demo.png",
+      "label": "Browse source files and sample data inside a ZIP archive.",
+      "width": 1000,
+      "height": 390
+    }
+  ]
+}
