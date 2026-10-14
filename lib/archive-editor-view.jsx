@@ -4,6 +4,10 @@ const path = require("path");
 const { CompositeDisposable, Disposable, Emitter, watchFile } = require("lumine");
 const etch = require("@lumine-code/etch");
 
+// This installed Etch copy has its own scheduler. Set it when the view loads,
+// before the first render, rather than loading Etch during package bootstrap.
+etch.setScheduler(lumine.views);
+
 const archive = require("./archive");
 const { formatCount, formatFileSize } = require("./format-summary");
 const FileView = require("./file-view");
