@@ -281,7 +281,9 @@ module.exports = class ArchiveEditorView {
       desiredScrollTop: state.scrollTop,
       desiredTreeScrollTop: state.treeScrollTop,
     });
-    this.element.ownerDocument.defaultView.requestAnimationFrame(() => {
+    this.scrollRestoreUpdate?.dispose();
+    this.scrollRestoreUpdate = lumine.views.updateDocument(() => {
+      this.scrollRestoreUpdate = null;
       if (this.scrollRestore !== token) return;
       this.scrollRestore = null;
       if (this.destroyed || this.path !== archivePath) return;
@@ -295,6 +297,7 @@ module.exports = class ArchiveEditorView {
   destroy() {
     if (this.destroyed) return;
     this.destroyed = true;
+    this.scrollRestoreUpdate?.dispose();
     this.resourceVersion++;
     this.cancelRequest();
     this.fileSubscriptions.dispose();
