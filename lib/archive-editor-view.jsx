@@ -604,6 +604,7 @@ module.exports = class ArchiveEditorView {
     this.entries = tree.entries;
     this.refs.tree.replaceChildren(tree.fragment);
     this.loaded = true;
+    this.emitter.emit("did-change-metadata");
     this.refs.tree.style.display = "";
     this.refs.loadingMessage.style.display = "none";
     this.refs.errorMessage.style.display = "none";
@@ -651,6 +652,37 @@ module.exports = class ArchiveEditorView {
 
   getSummary() {
     return this.summary;
+  }
+
+  getMetadata({ signal } = {}) {
+    signal?.throwIfAborted();
+    if (this.destroyed || !this.loaded) return [];
+    let files = 0,
+      directories = 0;
+    const pending = [...this.entries];
+    while (pending.length) {
+      const entry = pending.pop();
+      if (entry instanceof DirectoryView) {
+        directories++;
+        for (const child of entry.entries) pending.push(child);
+      } else {
+        files++;
+      }
+    }
+    return [
+      {
+        id: "archive",
+        title: "Archive",
+        rows: [
+          { id: "files", label: "Files", value: files },
+          { id: "directories", label: "Folders", value: directories },
+        ],
+      },
+    ];
+  }
+
+  onDidChangeMetadata(callback) {
+    return this.emitter.on("did-change-metadata", () => callback());
   }
 
   setSummary(summary) {

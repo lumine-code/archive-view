@@ -18,6 +18,8 @@ Keyboard navigation follows expanded branches and skips collapsed folders.
 
 ## Installation
 
+The Metadata panel shows the file and folder counts from the loaded archive, including nested entries.
+
 To install `archive-view` search for it in the Install pane of the Lumine settings, or run the command `lumine --install lumine-code/archive-view`.
 
 ## Customization

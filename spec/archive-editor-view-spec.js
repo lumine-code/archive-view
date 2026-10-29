@@ -41,6 +41,24 @@ describe("ArchiveEditorView", () => {
   });
 
   describe(".constructor()", () => {
+    it("reports all loaded archive entries and invalidates even if counts stay the same", async () => {
+      await condition(() => archiveEditorView.loaded);
+      const rows = archiveEditorView.getMetadata()[0].rows;
+      expect(rows.find((row) => row.id === "files").value).toBe(3);
+      expect(rows.find((row) => row.id === "directories").value).toBe(6);
+      const changed = jasmine.createSpy("archive metadata changed");
+      const lease = archiveEditorView.onDidChangeMetadata(changed);
+      try {
+        archiveEditorView.createTreeEntries(archiveEditorView.entries.map((entry) => entry.entry));
+        expect(changed).toHaveBeenCalledWith();
+        lease.dispose();
+        changed.calls.reset();
+        archiveEditorView.createTreeEntries(archiveEditorView.entries.map((entry) => entry.entry));
+        expect(changed).not.toHaveBeenCalled();
+      } finally {
+        lease.dispose();
+      }
+    });
     it("displays the files and folders in the archive file", async () => {
       expect(archiveEditorView.element).toExist();
       await condition(() => archiveEditorView.element.querySelectorAll(".entry").length > 0);
