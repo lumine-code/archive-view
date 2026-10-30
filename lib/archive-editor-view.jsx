@@ -201,7 +201,7 @@ module.exports = class ArchiveEditorView {
 
   render() {
     return (
-      <div className="archive-editor" tabIndex="-1">
+      <div className="archive-editor" tabIndex="-1" attributes={{ "data-scrollbar": "auto" }}>
         <div className="archive-container">
           <div
             ref="loadingMessage"
