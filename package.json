@@ -53,16 +53,24 @@
     }
   },
   "dependencies": {
-    "@lumine-code/etch": "github:lumine-code/etch#3e56e2460d890ab9b85e4f1d6bef236d34230530",
-    "@lumine-code/ls-archive": "github:lumine-code/ls-archive#be0bf19cda9335e34eb821b99f449f2140ce7139",
-    "@lumine-code/fs-temp": "github:lumine-code/fs-temp#f2ad78026b74af82520aaa07397b611e35807c9f"
+    "@lumine-code/etch": "github:lumine-code/etch#a543b97d4b75e1a7e92251e4998b5425a9714765",
+    "@lumine-code/ls-archive": "github:lumine-code/ls-archive#c06c407bbd5d3697ec767001ff69a14ed22ee34a",
+    "@lumine-code/fs-temp": "github:lumine-code/fs-temp#45485c522d8548846b20b2793adacb2146b53dc1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "eslint": "^10.13.0",
+    "eslint": "^10.14.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-n": "^18.5.0",
-    "globals": "^17.13.0",
+    "globals": "^17.14.0",
     "prettier": "^3.9.10"
+  },
+  "overrides": {
+    "eslint@^10.14.0": {
+      "minimatch": "11.0.4"
+    },
+    "@eslint/config-array@0.23.5": {
+      "minimatch": "11.0.4"
+    }
   }
 }
