@@ -53,7 +53,7 @@
     }
   },
   "dependencies": {
-    "@lumine-code/etch": "github:lumine-code/etch#3174556b1d3cd5b5ac85ad3475045aed3154ffb0",
+    "@lumine-code/etch": "github:lumine-code/etch#9f76bc0b47e49e645c25545d78ef439da3e081ee",
     "@lumine-code/ls-archive": "github:lumine-code/ls-archive#e295ea7b1e9936ccdac5066645d08d869be1bb4f",
     "@lumine-code/fs-temp": "github:lumine-code/fs-temp#9b1340f3e0ff15510ef28d63c62ff81a978fe9ff"
   },
