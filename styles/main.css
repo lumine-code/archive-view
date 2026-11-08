@@ -15,8 +15,8 @@
         padding: 5px;
 
         .entry:not(.selected) {
-          &.list-item:hover::before,
-          &.list-nested-item:has(> .list-item:hover)::before {
+          &.list-item:is(:hover, [data-context-menu-hover])::before,
+          &.list-nested-item:has(> .list-item:is(:hover, [data-context-menu-hover]))::before {
             content: "";
             position: absolute;
             right: 0;
@@ -25,8 +25,8 @@
             background-color: var(--background-color-highlight);
           }
 
-          &.list-item:hover > *,
-          &.list-nested-item:has(> .list-item:hover) > .list-item {
+          &.list-item:is(:hover, [data-context-menu-hover]) > *,
+          &.list-nested-item:has(> .list-item:is(:hover, [data-context-menu-hover])) > .list-item {
             position: relative;
           }
         }
