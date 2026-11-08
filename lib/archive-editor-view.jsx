@@ -67,6 +67,7 @@ module.exports = class ArchiveEditorView {
       lumine.commands.add(this.element, {
         "core:confirm": () => this.selectedFile?.openFile(),
         "core:move-down": () => {
+          lumine.scrollbars.reveal(this.element);
           if (this.selectedFile) {
             this.selectedFile.parentView.selectFileAfterIndex(this.selectedFile.indexInParentView);
           } else {
@@ -74,6 +75,7 @@ module.exports = class ArchiveEditorView {
           }
         },
         "core:move-up": () => {
+          lumine.scrollbars.reveal(this.element);
           if (this.selectedFile) {
             this.selectedFile.parentView.selectFileBeforeIndex(this.selectedFile.indexInParentView);
           } else {
