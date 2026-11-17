@@ -508,7 +508,7 @@ module.exports = class ArchiveEditorView {
     } catch (error) {
       if (error.name !== "AbortError" && !request.controller.signal.aborted && !this.destroyed) {
         lumine.notifications.addError("Unable to open archive", {
-          description: error.message,
+          detail: error.message,
           dismissable: true,
         });
       }
